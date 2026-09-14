@@ -19,15 +19,16 @@
             <form action="{{ route('admin.user.index') }}" method="GET" class="flex w-full md:w-80">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, role..."
                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-             <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-semibold rounded-r-lg transition">
-            Cari
-            </button>
-            @if(request('search'))
-            <a href="{{ route('admin.user.index') }}"
-                class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 text-sm rounded-lg flex items-center transition" title="Reset Pencarian">
-            </a>
-        @endif
-    </form>
+                <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-semibold rounded-r-lg transition">
+                    Cari
+                </button>
+                @if(request('search'))
+                    <a href="{{ route('admin.user.index') }}"
+                       class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 text-sm rounded-lg flex items-center transition" title="Reset Pencarian">
+                        Reset
+                    </a>
+                @endif
+            </form>
 
             <!-- Tombol Tambah User -->
             <a href="{{ route('admin.user.create') }}"
@@ -40,6 +41,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
+                        <th class="py-3 px-4 border-b">Foto</th>
                         <th class="py-3 px-4 border-b">Nama</th>
                         <th class="py-3 px-4 border-b">Email</th>
                         <th class="py-3 px-4 border-b">Role / Hak Akses</th>
@@ -51,6 +53,15 @@
                 <tbody class="text-gray-700 text-sm">
                     @forelse($users as $user)
                         <tr class="hover:bg-gray-50 transition">
+                            <td class="py-3 px-4 border-b">
+                                @if($user->profile_photo)
+                                    <img src="{{ asset('storage/' . $user->profile_photo) }}" 
+                                         class="w-12 h-12 rounded-full object-cover">
+                                @else
+                                    -
+                                @endif
+                            </td>
+
                             <td class="py-3 px-4 border-b font-medium text-gray-900">
                                 {{ $user->name }}
                             </td>
@@ -93,7 +104,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="py-4 text-center text-gray-500">
+                            <td colspan="6" class="py-4 text-center text-gray-500">
                                 Belum ada data pengguna.
                             </td>
                         </tr>

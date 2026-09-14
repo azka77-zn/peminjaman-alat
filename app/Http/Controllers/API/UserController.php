@@ -49,32 +49,35 @@ class UserController extends Controller
         ]);
     }
 
-    public function update(UpdateUserRequest $request, User $user): JsonResponse
-    {
-        $data = collect($request->validated());
-        DB::transaction(function () use ($request, $data, $user) {
-            if ($data->get('password')) {
-                $data['password'] = Hash::make($data['password']);
-            } else {
-                $data->forget('password'); // Sama fungsinya dengan unset()
-            }
+  public function updateUser(Request $request, $id)
+{
+    $user = User::findOrFail($id);
 
-            if ($request->hasFile('foto_profile')) {
-                if ($user->foto_profile) {
-                    Storage::disk('public')->delete($user->foto_profile);
-                }
-                $data['foto_profile'] = $request->file('foto_profile')->store('profiles', 'public');
-            }
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+        'role' => 'required|in:admin,petugas,peminjam,pelanggan',
+        'no_hp' => 'nullable|string|max:20',
+        'password' => 'nullable|string|min:6',
+        'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-            $user->update($data->toArray());
-        });
+    $data = $request->only(['name', 'email', 'role', 'no_hp']);
 
-        return response()->json([
-            'message' => 'Pengguna berhasil diperbarui.',
-            'data' => new UserResource($user)
-        ]);
+    if ($request->filled('password')) {
+        $data['password'] = Hash::make($request->password);
     }
 
+    if ($request->hasFile('foto_profile')) {
+        $path = $request->file('foto_profile')->store('profiles', 'public');
+        $data['foto_profile'] = $path;
+    }
+
+    $user->update($data);
+
+    return redirect()->route('admin.user.index')
+        ->with('success', 'Data pengguna berhasil diperbarui.');
+}
 
 public function destroy(User $user): JsonResponse
 {

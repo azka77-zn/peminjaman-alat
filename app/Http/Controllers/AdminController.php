@@ -11,6 +11,7 @@ use App\Models\Pengembalian;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -167,8 +168,13 @@ class AdminController extends Controller
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'in:admin,petugas,peminjam'],
             'no_hp' => ['nullable', 'string', 'max:20'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
         $data['password'] = bcrypt($data['password']);
+
+        if ($request->hasFile('profile_photo')) {
+            $data['profile_photo'] = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
 
         User::create($data);
 
@@ -190,16 +196,26 @@ class AdminController extends Controller
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
             'role' => ['required', 'in:admin,petugas,peminjam'],
             'no_hp' => ['nullable', 'string', 'max:20'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
         if ($request->filled('password')) {
             $data['password'] = bcrypt($request->password);
         }
 
+        if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+
+            $data['profile_photo'] = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
+
         $user->update($data);
 
         return redirect()->route('admin.user.index')->with('success', 'User berhasil diperbarui.');
     }
+
 
     public function destroyUser($id)
     {
