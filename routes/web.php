@@ -93,6 +93,8 @@ Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam
     Route::post('/peminjaman/ajukan', [PeminjamController::class, 'ajukanPeminjaman'])->name('peminjaman.ajukan');
 
     Route::get('/riwayat', [PeminjamController::class, 'riwayatPeminjaman'])->name('riwayat');
+    Route::get('/pengembalian', [PeminjamController::class, 'pengembalian'])
+    ->name('pengembalian');
 });
 
 // Route Tamu (Belum Login)

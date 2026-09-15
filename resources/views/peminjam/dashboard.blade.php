@@ -1,227 +1,363 @@
 @extends('layouts.app')
 
 @section('title', 'Dashboard Peminjam')
+@section('header-title', 'Dashboard Peminjam')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
 
-    {{-- Header --}}
-    <div class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-6 py-5">
-            <div class="flex items-center justify-between">
+<div class="space-y-6">
 
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">
-                        Dashboard Peminjam
-                    </h1>
+    {{-- HERO --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 shadow-xl">
 
-                    <p class="mt-1 text-sm text-gray-500">
-                        Kelola peminjaman alat dengan mudah.
-                    </p>
+        {{-- Background decoration --}}
+        <div class="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl"></div>
+
+        <div class="relative flex flex-col gap-6 p-7 md:flex-row md:items-center md:justify-between md:p-9">
+
+            {{-- Welcome --}}
+            <div class="text-white">
+
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-semibold text-blue-100 backdrop-blur-sm">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                    AKUN AKTIF
                 </div>
 
-                <div class="flex items-center gap-3">
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-gray-800">
-                            {{ auth()->user()->name ?? 'Peminjam' }}
-                        </p>
+                <p class="text-sm font-medium text-blue-200">
+                    Selamat datang kembali,
+                </p>
 
-                        <p class="text-xs text-gray-500">
-                            Peminjam
-                        </p>
+                <h1 class="mt-1 text-3xl font-bold tracking-tight md:text-4xl">
+                    {{ auth()->user()->name }}
+                </h1>
+
+
+                <div class="mt-6 flex flex-wrap gap-3">
+
+                    <a href="{{ route('peminjam.katalog') }}"
+                       class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-50">
+
+                        <span>📦</span>
+                        Lihat Katalog
+
+                    </a>
+
+                    <a href="{{ route('peminjam.riwayat') }}"
+                       class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
+
+                        <span>🧾</span>
+                        Riwayat Saya
+
+                    </a>
+
+                </div>
+            </div>
+
+            {{-- Profile mini card --}}
+            <div class="w-full md:w-auto">
+
+                <div class="min-w-[230px] rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-md">
+
+                    <div class="flex items-center gap-4">
+
+                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-2xl ring-1 ring-white/10">
+                            👤
+                        </div>
+
+                        <div>
+                            <p class="text-xs uppercase tracking-wider text-blue-200">
+                                Role
+                            </p>
+
+                            <p class="mt-1 text-lg font-bold text-white">
+                                {{ ucfirst(auth()->user()->role) }}
+                            </p>
+                        </div>
+
                     </div>
 
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span class="text-blue-600 font-bold">
-                            {{ strtoupper(substr(auth()->user()->name ?? 'P', 0, 1)) }}
-                        </span>
+                    <div class="mt-4 border-t border-white/10 pt-4">
+
+                        <div class="flex items-center justify-between text-sm">
+
+                            <span class="text-slate-300">
+                                Status
+                            </span>
+
+                            <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-300">
+                                <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+                                Aktif
+                            </span>
+
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
+
         </div>
     </div>
 
 
-    {{-- Main Content --}}
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    {{-- STATISTIK --}}
+    <div>
 
-        {{-- Welcome --}}
-        <div class="mb-8">
-            <h2 class="text-xl font-bold text-gray-800">
-                Halo, {{ auth()->user()->name ?? 'Peminjam' }} 👋
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-slate-800">
+                    Ringkasan Peminjaman
+                </h2>
+
+                <p class="text-sm text-slate-500">
+                    Informasi aktivitas peminjaman Anda.
+                </p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+            {{-- Total --}}
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">
+                            Total Peminjaman
+                        </p>
+
+                        <p class="mt-2 text-3xl font-bold text-slate-800">
+                            {{ $stats['total'] ?? 0 }}
+                        </p>
+
+                        <p class="mt-2 text-xs text-slate-400">
+                            Seluruh transaksi
+                        </p>
+                    </div>
+
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl transition group-hover:scale-110">
+                        📦
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Dipinjam --}}
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">
+                            Sedang Dipinjam
+                        </p>
+
+                        <p class="mt-2 text-3xl font-bold text-emerald-600">
+                            {{ $stats['dipinjam'] ?? 0 }}
+                        </p>
+
+                        <p class="mt-2 text-xs text-slate-400">
+                            Belum dikembalikan
+                        </p>
+                    </div>
+
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-xl transition group-hover:scale-110">
+                        📤
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Menunggu --}}
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg">
+
+                <div class="flex items-start justify-between">
+
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">
+                            Menunggu Pengembalian
+                        </p>
+
+                        <p class="mt-2 text-3xl font-bold text-amber-500">
+                            {{ $stats['menunggu'] ?? 0 }}
+                        </p>
+
+                        <p class="mt-2 text-xs text-slate-400">
+                            Perlu diperhatikan
+                        </p>
+                    </div>
+
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-xl transition group-hover:scale-110">
+                        ⏳
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- MENU UTAMA --}}
+    <div>
+
+        <div class="mb-4">
+            <h2 class="text-lg font-bold text-slate-800">
+                Menu Utama
             </h2>
 
-            <p class="text-gray-500 mt-1">
-                Selamat datang di sistem peminjaman alat.
+            <p class="text-sm text-slate-500">
+                Akses fitur peminjaman dengan cepat.
             </p>
         </div>
 
 
-        {{-- Menu Utama --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
-            {{-- Melihat Daftar Alat --}}
-            <a href="{{ url('/peminjam/katalog') }}"
-               class="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition">
+            {{-- Katalog --}}
+            <a href="{{ route('peminjam.katalog') }}"
+               class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
 
-                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-5">
-                    <svg class="w-6 h-6 text-blue-600"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M20 13V7a2 2 0 00-2-2h-4l-2-2H6a2 2 0 00-2 2v8m16 0v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6m16 0H4"/>
-                    </svg>
+                <div class="p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-2xl transition group-hover:scale-110">
+                            📚
+                        </div>
+
+                        <span class="text-slate-300 transition group-hover:translate-x-1 group-hover:text-blue-500">
+                            →
+                        </span>
+
+                    </div>
+
+                    <h3 class="mt-5 text-lg font-bold text-slate-800">
+                        Katalog Alat
+                    </h3>
+
+                    <p class="mt-2 text-sm leading-relaxed text-slate-500">
+                        Lihat daftar alat yang tersedia dan ajukan peminjaman.
+                    </p>
+
+                    <div class="mt-5 text-sm font-semibold text-blue-600">
+                        Buka katalog →
+                    </div>
+
                 </div>
 
-                <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-600">
-                    Daftar Alat
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-2">
-                    Lihat alat yang tersedia untuk dipinjam.
-                </p>
-
-                <div class="mt-5 text-sm font-semibold text-blue-600">
-                    Lihat alat →
-                </div>
             </a>
 
 
-            {{-- Ajukan Peminjaman --}}
-            <a href="{{ url('/peminjam/peminjaman') }}"
-               class="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-green-300 transition">
+            {{-- Riwayat --}}
+            <a href="{{ route('peminjam.riwayat') }}"
+               class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
 
-                <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-5">
-                    <svg class="w-6 h-6 text-green-600"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 4v16m8-8H4"/>
-                    </svg>
+                <div class="p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-2xl transition group-hover:scale-110">
+                            🧾
+                        </div>
+
+                        <span class="text-slate-300 transition group-hover:translate-x-1 group-hover:text-emerald-500">
+                            →
+                        </span>
+
+                    </div>
+
+                    <h3 class="mt-5 text-lg font-bold text-slate-800">
+                        Riwayat Peminjaman
+                    </h3>
+
+                    <p class="mt-2 text-sm leading-relaxed text-slate-500">
+                        Lihat semua transaksi peminjaman dan statusnya.
+                    </p>
+
+                    <div class="mt-5 text-sm font-semibold text-emerald-600">
+                        Lihat riwayat →
+                    </div>
+
                 </div>
 
-                <h3 class="text-lg font-bold text-gray-800 group-hover:text-green-600">
-                    Ajukan Peminjaman
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-2">
-                    Ajukan peminjaman alat yang kamu butuhkan.
-                </p>
-
-                <div class="mt-5 text-sm font-semibold text-green-600">
-                    Ajukan sekarang →
-                </div>
-            </a>
-
-
-            {{-- Riwayat Peminjaman --}}
-            <a href="{{ url('/peminjam/riwayat') }}"
-               class="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-purple-300 transition">
-
-                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-5">
-                    <svg class="w-6 h-6 text-purple-600"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-
-                <h3 class="text-lg font-bold text-gray-800 group-hover:text-purple-600">
-                    Riwayat Peminjaman
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-2">
-                    Lihat status dan riwayat peminjaman alat.
-                </p>
-
-                <div class="mt-5 text-sm font-semibold text-purple-600">
-                    Lihat riwayat →
-                </div>
             </a>
 
 
             {{-- Pengembalian --}}
-            <a href="{{ url('/peminjam/pengembalian') }}"
-               class="group bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md hover:border-orange-300 transition">
+            <a href="{{ route('peminjam.pengembalian') }}"
+               class="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl">
 
-                <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center mb-5">
-                    <svg class="w-6 h-6 text-orange-600"
-                         fill="none"
-                         stroke="currentColor"
-                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M3 10h11m0 0l-4-4m4 4l-4 4m11-4v8a2 2 0 01-2 2H5"/>
-                    </svg>
+                <div class="p-6">
+
+                    <div class="flex items-center justify-between">
+
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-2xl transition group-hover:scale-110">
+                            🔄
+                        </div>
+
+                        <span class="text-slate-300 transition group-hover:translate-x-1 group-hover:text-amber-500">
+                            →
+                        </span>
+
+                    </div>
+
+                    <h3 class="mt-5 text-lg font-bold text-slate-800">
+                        Pengembalian Alat
+                    </h3>
+
+                    <p class="mt-2 text-sm leading-relaxed text-slate-500">
+                        Periksa alat yang sedang dipinjam dan informasi pengembaliannya.
+                    </p>
+
+                    <div class="mt-5 text-sm font-semibold text-amber-600">
+                        Cek pengembalian →
+                    </div>
+
                 </div>
 
-                <h3 class="text-lg font-bold text-gray-800 group-hover:text-orange-600">
-                    Pengembalian Alat
-                </h3>
-
-                <p class="text-sm text-gray-500 mt-2">
-                    Ajukan pengembalian alat yang sedang dipinjam.
-                </p>
-
-                <div class="mt-5 text-sm font-semibold text-orange-600">
-                    Kembalikan alat →
-                </div>
             </a>
 
         </div>
 
+    </div>
 
-        {{-- Informasi --}}
-        <div class="mt-8 bg-white rounded-xl border border-gray-200 p-6">
 
-            <h3 class="text-lg font-bold text-gray-800 mb-4">
-                Informasi Peminjaman
-            </h3>
+    {{-- INFO --}}
+    <div class="rounded-2xl border border-blue-100 bg-blue-50 p-5">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="flex gap-4">
 
-                <div class="p-4 rounded-lg bg-blue-50">
-                    <p class="text-sm font-semibold text-blue-700">
-                        1. Pilih Alat
-                    </p>
-                    <p class="text-xs text-blue-600 mt-1">
-                        Lihat alat yang tersedia di katalog.
-                    </p>
-                </div>
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-lg">
+                💡
+            </div>
 
-                <div class="p-4 rounded-lg bg-green-50">
-                    <p class="text-sm font-semibold text-green-700">
-                        2. Ajukan
-                    </p>
-                    <p class="text-xs text-green-600 mt-1">
-                        Tentukan jumlah dan tanggal pengembalian.
-                    </p>
-                </div>
+            <div>
 
-                <div class="p-4 rounded-lg bg-orange-50">
-                    <p class="text-sm font-semibold text-orange-700">
-                        3. Kembalikan
-                    </p>
-                    <p class="text-xs text-orange-600 mt-1">
-                        Kembalikan alat setelah selesai digunakan.
-                    </p>
-                </div>
+                <h3 class="font-bold text-blue-900">
+                    Informasi Peminjaman
+                </h3>
+
+                <p class="mt-1 text-sm leading-relaxed text-blue-700">
+                    Pastikan memilih alat sesuai kebutuhan dan mengembalikannya
+                    sesuai dengan tanggal yang telah ditentukan.
+                </p>
 
             </div>
+
         </div>
 
     </div>
+
 </div>
+
 @endsection
