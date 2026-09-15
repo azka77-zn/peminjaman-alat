@@ -1,106 +1,183 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Alat - Peminjam</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+@extends('layouts.app')
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">Panel Peminjam</a>
-            <div class="d-flex">
-                <a href="{{ route('peminjam.riwayat') }}" class="btn btn-outline-light me-2">
-                    Riwayat Pinjam
-                </a>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-light border text-primary">
-                        Logout
-                    </button>
-                </form>
-            </div>
+@section('title', 'Katalog Alat')
+
+@section('header-title', 'Katalog Alat')
+
+@section('content')
+
+<div class="space-y-6">
+
+    {{-- Pesan sukses --}}
+    @if(session('success'))
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+            {{ session('success') }}
         </div>
-    </nav>
+    @endif
 
-    <div class="container">
+    {{-- Pesan error --}}
+    @if(session('error'))
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {{ session('error') }}
+        </div>
+    @endif
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
-        <h3 class="mb-3">Katalog Alat Tersedia</h3>
-
-        <form action="{{ route('peminjam.peminjaman.ajukan') }}" method="POST">
-            @csrf
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-
-                    <div class="mb-3">
-                        <label class="form-label">Rencana Tanggal Kembali</label>
-                        <input type="date" name="tgl_kembali_plan" class="form-control" required>
-                    </div>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="5%">Pilih</th>
-                                <th>Nama Alat</th>
-                                <th>Kategori</th>
-                                <th>Stok Tersedia</th>
-                                <th width="15%">Jumlah Pinjam</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @forelse($alats as $index => $alat)
-                                <tr class="text-center">
-                                    <td>
-                                        <input type="checkbox"
-                                               name="alat_id[]"
-                                               value="{{ $alat->id }}"
-                                               class="form-check-input">
-                                    </td>
-
-                                    <td>{{ $alat->nama_alat }}</td>
-                                    <td>{{ $alat->kategori->nama_kategori ?? '-' }}</td>
-                                    <td>{{ $alat->stok }}</td>
-
-                                    <td>
-                                        <input type="number"
-                                               name="jumlah[]"
-                                               class="form-control form-control-sm"
-                                               value="1"
-                                               min="1"
-                                               max="{{ $alat->stok }}">
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">
-                                        Tidak ada alat yang tersedia saat ini.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-
-                    <button type="submit" class="btn btn-primary">
-                        Ajukan Peminjaman
-                    </button>
-
-                </div>
-            </div>
-        </form>
-
+    {{-- Header --}}
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800">
+                Katalog Alat Tersedia
+            </h2>
+            <p class="text-sm text-gray-500 mt-1">
+                Pilih alat yang ingin kamu pinjam.
+            </p>
+        </div>
     </div>
 
-</body>
-</html>
+    {{-- Form Peminjaman --}}
+    <form action="{{ route('peminjam.peminjaman.ajukan') }}" method="POST">
+        @csrf
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+
+            {{-- Bagian tanggal --}}
+            <div class="p-6 border-b border-gray-200">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Rencana Tanggal Kembali
+                </label>
+
+                <input
+                    type="date"
+                    name="tgl_kembali_plan"
+                    required
+                    class="w-full md:w-80 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+            </div>
+
+            {{-- Tabel alat --}}
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-sm text-left">
+
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="py-3 px-4 text-center font-semibold text-gray-700">
+                                Pilih
+                            </th>
+
+                             <th class="py-3 px-4 text-center font-semibold text-gray-700">
+                                Gambar
+                            </th>
+                            <th class="py-3 px-4 font-semibold text-gray-700">
+                                Nama Alat
+                            </th>
+
+                            <th class="py-3 px-4 font-semibold text-gray-700">
+                                Kategori
+                            </th>
+
+                            <th class="py-3 px-4 text-center font-semibold text-gray-700">
+                                Stok
+                            </th>
+
+                            <th class="py-3 px-4 text-center font-semibold text-gray-700">
+                                Jumlah
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @forelse($alats as $index => $alat)
+
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+
+                                {{-- Checkbox --}}
+                                <td class="py-3 px-4 text-center">
+                                    <input
+                                        type="checkbox"
+                                        name="alat_id[]"
+                                        value="{{ $alat->id }}"
+                                        class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    >
+                                    <td class="py-3 px-4 text-center">
+                                        @if($alat->gambar)
+                                            <img
+                                                src="{{ asset('storage/' . $alat->gambar) }}"
+                                                alt="{{ $alat->nama_alat }}"
+                                                class="w-16 h-16 object-cover rounded-lg mx-auto border border-gray-200"
+                                            >
+                                        @else
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto">
+                                                <span class="text-xs text-gray-400">Tidak ada</span>
+                                            </div>
+                                        @endif
+                                    </td>
+                                </td>
+
+                                {{-- Nama alat --}}
+                                <td class="py-3 px-4 font-medium text-gray-800">
+                                    {{ $alat->nama_alat }}
+                                </td>
+
+                                {{-- Kategori --}}
+                                <td class="py-3 px-4 text-gray-600">
+                                    {{ $alat->kategori->nama_kategori ?? '-' }}
+                                </td>
+
+                                {{-- Stok --}}
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                        {{ $alat->stok }}
+                                    </span>
+                                </td>
+
+                                {{-- Jumlah --}}
+                                <td class="py-3 px-4">
+                                    <input
+                                        type="number"
+                                        name="jumlah[]"
+                                        value="1"
+                                        min="1"
+                                        max="{{ $alat->stok }}"
+                                        class="w-24 mx-auto block border border-gray-300 rounded-lg px-2 py-1.5 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+                                <td colspan="5" class="py-10 text-center text-gray-500">
+                                    Tidak ada alat yang tersedia saat ini.
+                                </td>
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {{-- Footer --}}
+            <div class="p-6 border-t border-gray-200 flex justify-end">
+
+                <button
+                    type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition"
+                >
+                    Ajukan Peminjaman
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+@endsection
