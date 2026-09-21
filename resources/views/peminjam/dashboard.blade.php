@@ -31,27 +31,6 @@
                 <h1 class="mt-1 text-3xl font-bold tracking-tight md:text-4xl">
                     {{ auth()->user()->name }}
                 </h1>
-
-
-                <div class="mt-6 flex flex-wrap gap-3">
-
-                    <a href="{{ route('peminjam.katalog') }}"
-                       class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-blue-50">
-
-                        <span>📦</span>
-                        Lihat Katalog
-
-                    </a>
-
-                    <a href="{{ route('peminjam.riwayat') }}"
-                       class="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
-
-                        <span>🧾</span>
-                        Riwayat Saya
-
-                    </a>
-
-                </div>
             </div>
 
             {{-- Profile mini card --}}
@@ -330,30 +309,7 @@
         </div>
 
     </div>
-
-
-    {{-- INFO --}}
-    <div class="rounded-2xl border border-blue-100 bg-blue-50 p-5">
-
-        <div class="flex gap-4">
-
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-lg">
-                💡
-            </div>
-
-            <div>
-
-                <h3 class="font-bold text-blue-900">
-                    Informasi Peminjaman
-                </h3>
-
-                <p class="mt-1 text-sm leading-relaxed text-blue-700">
-                    Pastikan memilih alat sesuai kebutuhan dan mengembalikannya
-                    sesuai dengan tanggal yang telah ditentukan.
-                </p>
-
-            </div>
-
+    
         </div>
 
     </div>

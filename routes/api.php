@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         [PengembalianController::class, 'destroy']);
         Route::get('/log-aktivitas',[LogAktivitasController::class, 'index']);
         Route::get('/laporan-peminjaman', [LaporanController::class, 'index']);
+        Route::put('/users/{id}', [UserController::class, 'updateUser']);
     });
 
     Route::middleware('role.petugas')->group(function () {
