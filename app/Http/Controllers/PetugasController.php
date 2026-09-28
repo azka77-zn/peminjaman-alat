@@ -54,28 +54,59 @@ class PetugasController extends Controller
     /**
      * Menyetujui peminjaman
      */
-    public function setujuiPeminjaman($id)
-    {
-        DB::beginTransaction();
+   public function setujuiPeminjaman($id)
+{
+    DB::beginTransaction();
 
-        try {
-            $peminjaman = Peminjaman::with('detailPinjam')->findOrFail($id);
-            $peminjaman->update(['status' => 'dipinjam']);
+    try {
+        $peminjaman = Peminjaman::with('detailPinjam')
+            ->lockForUpdate()
+            ->findOrFail($id);
 
-            // Kurangi stok alat
-            foreach ($peminjaman->detailPinjam as $detail) {
-                $alat = Alat::findOrFail($detail->alat_id);
-                $alat->stok -= $detail->jumlah;
-                $alat->save();
-            }
-
-            DB::commit();
-            return redirect()->back()->with('success', 'Peminjaman disetujui dan stok alat dikurangi.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // Pastikan peminjaman masih menunggu persetujuan
+        if ($peminjaman->status !== 'diajukan') {
+            throw new \Exception('Peminjaman ini sudah diproses.');
         }
+
+        // Cek stok terlebih dahulu
+        foreach ($peminjaman->detailPinjam as $detail) {
+            $alat = Alat::lockForUpdate()
+                ->findOrFail($detail->alat_id);
+
+            if ($alat->stok < $detail->jumlah) {
+                throw new \Exception(
+                    "Stok alat '{$alat->nama_alat}' tidak mencukupi. Sisa stok: {$alat->stok}."
+                );
+            }
+        }
+
+        // Kalau semua stok cukup, baru ubah status
+        $peminjaman->update([
+            'status' => 'dipinjam'
+        ]);
+
+        // Kurangi stok
+        foreach ($peminjaman->detailPinjam as $detail) {
+            $alat = Alat::lockForUpdate()
+                ->findOrFail($detail->alat_id);
+
+            $alat->decrement('stok', $detail->jumlah);
+        }
+
+        DB::commit();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Peminjaman disetujui dan stok alat dikurangi.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        return redirect()
+            ->back()
+            ->with('error', $e->getMessage());
     }
+}
 
     /**
      * Menampilkan daftar pengembalian
