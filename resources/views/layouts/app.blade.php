@@ -82,6 +82,15 @@
         Katalog Alat
     </a>
 
+
+     <a href="{{ route('peminjam.pengembalian') }}"
+       class="block px-4 py-2 rounded-lg transition {{
+           request()->routeIs('peminjam.pengembalian') ?
+           'bg-gray-800 text-white font-medium shadow' :
+           'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+        Pengembalian Alat
+    </a>
+    
     <a href="{{ route('peminjam.riwayat') }}"
        class="block px-4 py-2 rounded-lg transition {{
            request()->routeIs('peminjam.riwayat') ?
@@ -90,13 +99,6 @@
         Riwayat Peminjaman
     </a>
 
-    <a href="{{ route('peminjam.pengembalian') }}"
-       class="block px-4 py-2 rounded-lg transition {{
-           request()->routeIs('peminjam.pengembalian') ?
-           'bg-gray-800 text-white font-medium shadow' :
-           'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
-        Pengembalian Alat
-    </a>
                 @endif
             </nav>
             <div class="p-4 border-t border-gray-800 text-sm text-gray-400">
