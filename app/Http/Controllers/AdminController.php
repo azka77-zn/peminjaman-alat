@@ -123,20 +123,32 @@ class AdminController extends Controller
     }
 
     // 6. Menghapus data alat
-    public function destroyAlat($id)
-    {
-        $alat = Alat::findOrFail($id);
+   public function destroyAlat($id)
+{
+    $alat = Alat::findOrFail($id);
 
-        // Hapus file gambar fisik jika ada
-        if ($alat->gambar && file_exists(public_path($alat->gambar))) {
+    // Cek apakah alat masih sedang dipinjam
+    $sedangDipinjam = Peminjaman::whereIn('status', ['dipinjam', 'telat'])
+        ->whereHas('detailPinjam', function ($query) use ($alat) {
+            $query->where('alat_id', $alat->id);
+        })
+        ->exists();
+
+    if ($sedangDipinjam) {
+        return redirect()->route('admin.alat.index')
+            ->with('error', 'Alat tidak dapat dihapus karena masih sedang dipinjam oleh pengguna.');
+    }
+
+    // Hapus file gambar fisik jika ada
+    if ($alat->gambar && file_exists(public_path($alat->gambar))) {
         unlink(public_path($alat->gambar));
     }
 
     $alat->delete();
 
-        return redirect()->route('admin.alat.index')
-            ->with('success', 'Data alat berhasil dihapus.');
-    }
+    return redirect()->route('admin.alat.index')
+        ->with('success', 'Alat berhasil dihapus.');
+}
 
     // CRUD User (Manajemen User Admin, Petugas, Peminjam)
     public function indexUser(Request $request)
@@ -217,12 +229,25 @@ class AdminController extends Controller
     }
 
 
-    public function destroyUser($id)
-    {
-        User::findOrFail($id)->delete();
+        public function destroyUser($id)
+        {
+            $user = User::findOrFail($id);
 
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil dihapus.');
-    }
+            // Cek apakah user masih memiliki alat yang sedang dipinjam
+            $peminjamanAktif = $user->peminjaman()
+                ->whereIn('status', ['dipinjam', 'telat'])
+                ->exists();
+
+            if ($peminjamanAktif) {
+                return redirect()->route('admin.user.index')
+                    ->with('error', 'User tidak dapat dihapus karena masih memiliki alat yang sedang dipinjam.');
+            }
+
+            $user->delete();
+
+            return redirect()->route('admin.user.index')
+                ->with('success', 'User berhasil dihapus.');
+        }
 
     // 1. Menampilkan form indeks kategori dengan pencarian
     public function indexKategori(Request $request)

@@ -80,17 +80,39 @@ class UserController extends Controller
         ->with('success', 'Data pengguna berhasil diperbarui.');
 }
 
-public function destroy(User $user): JsonResponse
-{
-    DB::transaction(function () use ($user) {
-        if ($user->foto_profile) {
-            Storage::disk('public')->delete($user->foto_profile);
-        }
-        $user->delete();
-    });
+    public function destroy(User $user): JsonResponse
+    {
+        try {
+            DB::transaction(function () use ($user) {
 
-    return response()->json([
-        'message' => 'Pengguna berhasil dihapus.'
-    ]);
-}
+                // Cek apakah user masih memiliki peminjaman aktif
+                $peminjamanAktif = $user->peminjaman()
+                    ->whereIn('status', ['dipinjam', 'telat'])
+                    ->exists();
+
+                if ($peminjamanAktif) {
+                    throw new Exception(
+                        'User tidak dapat dihapus karena masih memiliki peminjaman alat yang belum dikembalikan.'
+                    );
+                }
+
+                // Hapus foto profile jika ada
+                if ($user->foto_profile) {
+                    Storage::disk('public')->delete($user->foto_profile);
+                }
+
+                // Hapus user
+                $user->delete();
+            });
+
+            return response()->json([
+                'message' => 'User berhasil dihapus.'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
 }
