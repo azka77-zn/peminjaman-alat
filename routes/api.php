@@ -50,7 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role.petugas')->group(function () {
     Route::post('/peminjaman/{peminjaman}/approve',
     [PeminjamanController::class, 'approve']);
-    Route::post('/pengembalian', [PengembalianController::class, 'store']);    
+    Route::post('/pengembalian', [PengembalianController::class, 'store']);
+    Route::get('/laporan-peminjaman', [LaporanController::class, 'index']);    
     // Route untuk hak akses petugas
     });
 
